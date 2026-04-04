@@ -1,0 +1,43 @@
+<div class="dashboard">
+  <div class="topbar">
+    <button class="btn-home" (click)="router.navigate(['/home'])">← Home</button>
+    <h2>📚 My Documents</h2>
+    <div class="topbar-actions">
+      <button class="btn-primary" (click)="goToAsk()">+ Upload New PDF</button>
+      <button class="btn-logout" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  @if(loading) {
+  <div class="loading">Loading your documents...</div>
+  }
+
+  @if(!loading && sessions.length === 0) {
+  <div class="empty">
+    <p>No documents yet. Upload your first PDF to get started.</p>
+    <button class="btn-primary" (click)="goToAsk()">Upload PDF 📄</button>
+  </div>
+  }
+
+  <div class="grid">
+    @for(session of sessions; track session.id) {
+    <div class="card">
+      <div class="card-info">
+        <span class="card-icon">📄</span>
+        <div class="card-details">
+          <div class="card-title">{{ session.filename }}</div>
+          <div class="card-meta">
+            <span class="badge">{{ (session.qaHistory || []).length }} Q&amp;As</span>
+            <span class="date">{{ session.uploadedAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-secondary" (click)="goToHistory(session.id)">📜 View History</button>
+        <button class="btn-primary" (click)="goToAskExisting(session.id)">🤖 Ask Question</button>
+        <button class="btn-delete" (click)="deleteSession(session.id)">🗑️ Delete</button>
+      </div>
+    </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="history-page">
+  <div class="topbar">
+    <button class="btn-back" (click)="goBack()">← Dashboard</button>
+    @if(session) {
+    <div class="topbar-title">
+      <span>📄</span>
+      <span>{{ session.filename }}</span>
+    </div>
+    <button class="btn-primary" (click)="goToAsk()">🤖 Ask New Question</button>
+    }
+  </div>
+
+  @if(loading) {
+  <div class="loading">Loading history...</div>
+  }
+
+  @if(!loading && session) {
+  @if(session.qaHistory.length === 0) {
+  <div class="empty">No questions asked yet for this document.</div>
+  }
+  <div class="qa-list">
+    @for(qa of session.qaHistory; track qa.id) {
+    <div class="qa-card">
+      <div class="question">❓ {{ qa.question }}</div>
+      <div class="answer">💬 {{ qa.answer }}</div>
+    </div>
+    }
+  </div>
+  }
+</div>

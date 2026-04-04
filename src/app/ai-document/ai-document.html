@@ -1,0 +1,34 @@
+<div class="ask-page">
+  <div class="topbar">
+    <button class="btn-back" (click)="goToDashboard()">← Back to Dashboard</button>
+    <h2>📄 AI Document Assistant</h2>
+  </div>
+
+  <div class="card">
+    <!-- Upload Section -->
+    <div class="section">
+      <label class="label">Upload PDF</label>
+      <input type="file" accept=".pdf" (change)="uploadFile($event)" />
+      @if(isUploaded) {
+      <div class="uploaded-badge">✅ {{ filename }} uploaded</div>
+      }
+    </div>
+
+    <!-- Question Section -->
+    <div class="section">
+      <label class="label">Ask a Question</label>
+      <input [(ngModel)]="question" placeholder="Ask something from the document..." class="input" />
+    </div>
+
+    <button (click)="askQuestion()" [disabled]="!isUploaded || !question || loading" class="btn-primary">
+      {{ loading ? 'Thinking... 🤔' : 'Ask AI 🤖' }}
+    </button>
+
+    @if(answer) {
+    <div class="answer-box">
+      <h3>📢 Answer</h3>
+      <p>{{ answer }}</p>
+    </div>
+    }
+  </div>
+</div>
