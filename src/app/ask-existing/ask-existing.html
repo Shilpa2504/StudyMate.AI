@@ -1,0 +1,36 @@
+<div class="ask-page">
+  <div class="topbar">
+    <button class="btn-back" (click)="goBack()">← Dashboard</button>
+    <div class="topbar-title">
+      <span>📄</span>
+      <span>{{ filename }}</span>
+    </div>
+    <button class="btn-secondary" (click)="viewHistory()">📜 View History</button>
+    <button class="btn-quiz" (click)="goToQuiz()">📝 Quiz</button>
+  </div>
+
+  @if(!ready) {
+  <div class="loading">Loading document...</div>
+  }
+
+  @if(ready) {
+  <div class="card">
+    <div class="section">
+      <label class="label">Ask a Question</label>
+      <input [(ngModel)]="question" placeholder="Ask something from the document..." class="input"
+        (keyup.enter)="askQuestion()" />
+    </div>
+
+    <button class="btn-primary" (click)="askQuestion()" [disabled]="!question.trim() || loading">
+      {{ loading ? 'Thinking... 🤔' : 'Ask AI 🤖' }}
+    </button>
+
+    @if(answer) {
+    <div class="answer-box">
+      <h3>📢 Answer</h3>
+      <p>{{ answer }}</p>
+    </div>
+    }
+  </div>
+  }
+</div>
