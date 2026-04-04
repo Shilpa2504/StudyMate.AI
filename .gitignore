@@ -42,3 +42,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Sensitive config / secrets - never commit these
+backend_document-app/Practise_spring/src/main/resources/application-local.properties
+*.env
+.env
+.env.*
+!.env.example
