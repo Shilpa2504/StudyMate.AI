@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { QuizQuestion } from './quiz/quiz';
+import { environment } from '../environments/environment';
 
 export interface QaItem {
   id: number;
@@ -51,7 +52,7 @@ export interface UploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
-  private base = 'http://localhost:8080/api/document';
+  private base = `${environment.apiUrl}/api/document`;
 
   constructor(private http: HttpClient) { }
 

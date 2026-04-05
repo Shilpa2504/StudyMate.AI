@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
 export class Aiservice {
-private baseUrl = "http://localhost:8080/api/document";
+  private baseUrl = `${environment.apiUrl}/api/document`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   uploadPdf(file: File) {
 
@@ -21,7 +22,7 @@ private baseUrl = "http://localhost:8080/api/document";
   }
 
   askQuestion(documentText: string, question: string) {
-    
+
     return this.http.post(
       this.baseUrl + "/ask",
       {
