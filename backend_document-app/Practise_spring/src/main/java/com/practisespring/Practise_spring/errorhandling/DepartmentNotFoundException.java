@@ -6,7 +6,7 @@ public class DepartmentNotFoundException extends Exception{
     }
 
     public DepartmentNotFoundException(String message){
-        super(messagge);
+        super(message);
     }
 
 
