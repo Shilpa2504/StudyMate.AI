@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
     //@RequestMapping(value="/",method= RequestMethod.GET)
 
-    @Value("${welcome.message}")
+    @Value("${welcome.message:StudyMate AI is running}")
     private String welcomeMessage;
     @GetMapping("/")
     public String helloWorld(){
