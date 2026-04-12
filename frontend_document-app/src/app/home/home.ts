@@ -16,7 +16,7 @@ export class Home implements OnInit {
   sessions: PdfSession[] = [];
   totalQAs = 0;
   totalQuizAttempts = 0;
-  isDark = true;
+  isDark = false;
 
   features = [
     {

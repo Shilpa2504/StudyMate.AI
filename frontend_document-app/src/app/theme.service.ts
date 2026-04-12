@@ -6,7 +6,7 @@ export class ThemeService {
 
   constructor() {
     const saved = localStorage.getItem('theme');
-    this.dark = saved ? saved === 'dark' : true;
+    this.dark = saved ? saved === 'dark' : false;
     this.apply();
   }
 
