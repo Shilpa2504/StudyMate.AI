@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { DocumentService, PdfSession } from '../document.service';
+import { DocumentService, PdfSession, QuizAttemptHistory } from '../document.service';
+import { ThemeService } from '../theme.service';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ export class Home implements OnInit {
   sessions: PdfSession[] = [];
   totalQAs = 0;
   totalQuizAttempts = 0;
+  isDark = true;
 
   features = [
     {
@@ -63,15 +65,19 @@ export class Home implements OnInit {
 
   // quiz analytics — last 6 attempts across all sessions
   quizBars: { label: string; pct: number; score: string }[] = [];
+  allQuizHistory: QuizAttemptHistory[] = [];
+  expandedQuizId: number | null = null;
 
   constructor(
     private router: Router,
     private auth: AuthService,
     private docService: DocumentService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private theme: ThemeService
   ) {
     this.username = this.auth.getUsername();
+    this.isDark = this.theme.isDark();
   }
 
   ngOnInit() {
@@ -89,6 +95,27 @@ export class Home implements OnInit {
 
     // load quiz history for first session that has attempts for the graph
     this.loadQuizGraph();
+    this.loadAllQuizHistory();
+  }
+
+  loadAllQuizHistory() {
+    this.docService.getAllQuizHistory().subscribe({
+      next: data => {
+        this.zone.run(() => {
+          this.allQuizHistory = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => { }
+    });
+  }
+
+  toggleQuiz(id: number) {
+    this.expandedQuizId = this.expandedQuizId === id ? null : id;
+  }
+
+  percent(a: QuizAttemptHistory) {
+    return Math.round((a.score / a.total) * 100);
   }
 
   loadQuizGraph() {
@@ -117,5 +144,7 @@ export class Home implements OnInit {
   }
 
   goToDocuments() { this.router.navigate(['/my-documents']); }
+  goToQuizHistory() { this.router.navigate(['/all-quiz-history']); }
+  toggleTheme() { this.theme.toggle(); this.isDark = this.theme.isDark(); }
   logout() { this.auth.logout(); this.router.navigate(['/login']); }
 }

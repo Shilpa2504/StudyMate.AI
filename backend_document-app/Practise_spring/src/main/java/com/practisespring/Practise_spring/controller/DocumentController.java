@@ -8,10 +8,12 @@ import com.practisespring.Practise_spring.model.QuizAttemptRequest;
 import com.practisespring.Practise_spring.model.QuizQuestion;
 import com.practisespring.Practise_spring.repository.PdfSessionRepository;
 import com.practisespring.Practise_spring.repository.QuizAttemptRepository;
+import com.practisespring.Practise_spring.repository.UserRepository;
 import com.practisespring.Practise_spring.service.AIService;
 import com.practisespring.Practise_spring.service.PDFService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.ObjectMapper;
@@ -27,11 +29,20 @@ public class DocumentController {
     private final PDFService pdfService;
     private final AIService aiService;
     private final PdfSessionRepository sessionRepo;
+    private final UserRepository userRepository;
 
-    public DocumentController(PDFService pdfService, AIService aiService, PdfSessionRepository sessionRepo) {
+    public DocumentController(PDFService pdfService, AIService aiService, PdfSessionRepository sessionRepo, UserRepository userRepository) {
         this.pdfService = pdfService;
         this.aiService = aiService;
         this.sessionRepo = sessionRepo;
+        this.userRepository = userRepository;
+    }
+
+    private Long getCurrentUserId() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getId();
     }
 
 //    @PostMapping("/upload")
@@ -53,8 +64,9 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("fileHash") String fileHash) throws Exception {
 
-        // Check if this PDF was already uploaded (by hash)
-        Optional<PdfSession> existing = sessionRepo.findByFileHash(fileHash);
+        // Check if this PDF was already uploaded (by hash) for this user
+        Long userId = getCurrentUserId();
+        Optional<PdfSession> existing = sessionRepo.findByFileHashAndUserId(fileHash, userId);
         if (existing.isPresent()) {
             PdfSession s = existing.get();
             return ResponseEntity.ok(Map.of(
@@ -65,12 +77,13 @@ public class DocumentController {
         }
 
         // New PDF — extract text and save
-        String text = pdfService.extractText(file); // your existing method
+        String text = pdfService.extractText(file);
         PdfSession session = new PdfSession();
         session.setFilename(file.getOriginalFilename());
         session.setDocumentText(text);
         session.setFileHash(fileHash);
         session.setUploadedAt(LocalDateTime.now());
+        session.setUserId(userId);
         PdfSession saved = sessionRepo.save(session);
 
         return ResponseEntity.ok(Map.of(
@@ -97,7 +110,7 @@ public class DocumentController {
 
     @GetMapping("/sessions")
     public List<PdfSession> getSessions() {
-        return sessionRepo.findAll();
+        return sessionRepo.findByUserId(getCurrentUserId());
     }
 
     @GetMapping("/sessions/{id}")
@@ -176,6 +189,34 @@ public class DocumentController {
                     "attemptId", attempt.getId()
             ));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/quiz/history/all")
+    public ResponseEntity<?> getAllQuizHistory() throws Exception {
+        Long userId = getCurrentUserId();
+        List<PdfSession> sessions = sessionRepo.findByUserId(userId);
+        List<Long> sessionIds = sessions.stream().map(PdfSession::getId).toList();
+        if (sessionIds.isEmpty()) return ResponseEntity.ok(List.of());
+
+        List<QuizAttempt> attempts = quizAttemptRepository.findBySessionIdInOrderByAttemptedAtDesc(sessionIds);
+        Map<Long, String> sessionNames = sessions.stream()
+                .collect(java.util.stream.Collectors.toMap(PdfSession::getId, PdfSession::getFilename));
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (QuizAttempt a : attempts) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", a.getId());
+            map.put("sessionId", a.getSession().getId());
+            map.put("filename", sessionNames.getOrDefault(a.getSession().getId(), "Unknown"));
+            map.put("attemptNumber", a.getAttemptNumber());
+            map.put("score", a.getScore());
+            map.put("total", a.getTotal());
+            map.put("attemptedAt", a.getAttemptedAt());
+            map.put("questions", mapper.readValue(a.getQuestionsJson(), List.class));
+            result.add(map);
+        }
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/quiz/history/{sessionId}")

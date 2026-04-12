@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> {
     List<QuizAttempt> findBySessionIdOrderByAttemptNumberAsc(Long sessionId);
+    List<QuizAttempt> findBySessionIdInOrderByAttemptedAtDesc(List<Long> sessionIds);
 }
 

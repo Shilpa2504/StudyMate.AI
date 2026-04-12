@@ -25,13 +25,12 @@ export class Signup {
     this.cdr.detectChanges();
     this.auth.signup(this.username, this.email, this.password).subscribe({
       next: res => {
-        this.auth.saveSession(res.token, res.username);
         this.loading = false;
         this.cdr.detectChanges();
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       },
       error: err => {
-        this.error = err.error?.message || 'Signup failed. Please try again.';
+        this.error = err.error?.detail || err.error?.message || 'Signup failed. Please try again.';
         this.loading = false;
         this.cdr.detectChanges();
       }

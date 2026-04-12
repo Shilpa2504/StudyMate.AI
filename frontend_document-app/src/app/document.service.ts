@@ -32,6 +32,8 @@ export interface QuizAttemptResult {
 
 export interface QuizAttemptHistory {
   id: number;
+  sessionId: number;
+  filename: string;
   attemptNumber: number;
   score: number;
   total: number;
@@ -98,5 +100,9 @@ export class DocumentService {
 
   getQuizHistory(sessionId: number) {
     return this.http.get<QuizAttemptHistory[]>(`${this.base}/quiz/history/${sessionId}`);
+  }
+
+  getAllQuizHistory() {
+    return this.http.get<QuizAttemptHistory[]>(`${this.base}/quiz/history/all`);
   }
 }

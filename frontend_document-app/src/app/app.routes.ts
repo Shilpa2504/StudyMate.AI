@@ -11,6 +11,7 @@ export const routes: Routes = [
   { path: 'history/:id', loadComponent: () => import('./history/history').then(m => m.History), canActivate: [authGuard] },
   { path: 'quiz/:id', loadComponent: () => import('./quiz/quiz').then(m => m.Quiz), canActivate: [authGuard] },
   { path: 'quiz-history/:id', loadComponent: () => import('./quiz-history/quiz-history').then(m => m.QuizHistory), canActivate: [authGuard] },
+  { path: 'all-quiz-history', loadComponent: () => import('./all-quiz-history/all-quiz-history').then(m => m.AllQuizHistory), canActivate: [authGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' }
 ];

@@ -29,4 +29,7 @@ public class PdfSession {
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private int quizAttempts = 0;
+
+    @Column(name = "user_id")
+    private Long userId;
 }

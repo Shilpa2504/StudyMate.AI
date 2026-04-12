@@ -1,0 +1,55 @@
+<div class="qh-page">
+  <div class="topbar">
+    <button class="btn-back" (click)="goBack()">← Back</button>
+    <div class="topbar-title">📝 Quiz History</div>
+  </div>
+
+  @if(loading) {
+  <div class="loading">Loading...</div>
+  }
+
+  @if(!loading && attempts.length === 0) {
+  <div class="empty">
+    <div class="empty-icon">📊</div>
+    <p>No quiz attempts yet. Take a quiz to see your history here.</p>
+  </div>
+  }
+
+  @if(!loading && attempts.length > 0) {
+  <div class="attempts-list">
+    @for(attempt of attempts; track attempt.id) {
+    <div class="attempt-card">
+      <div class="attempt-header" (click)="toggle(attempt.id)">
+        <div class="attempt-meta">
+          <span class="attempt-pdf">📄 {{ attempt.filename }}</span>
+          <span class="attempt-num">Attempt #{{ attempt.attemptNumber }}</span>
+        </div>
+        <div class="attempt-score-row">
+          <div class="score-pill" [class.good]="percent(attempt) >= 60" [class.bad]="percent(attempt) < 60">
+            {{ attempt.score }} / {{ attempt.total }} ({{ percent(attempt) }}%)
+          </div>
+          <span class="chevron">{{ expandedId === attempt.id ? 'Hide ▲' : 'Show ▼' }}</span>
+        </div>
+      </div>
+      @if(expandedId === attempt.id) {
+      <div class="questions-list">
+        @for(q of attempt.questions; track $index; let qi = $index) {
+        <div class="q-item" [class.correct]="q['selectedIndex'] === q['correctIndex']"
+          [class.wrong]="q['selectedIndex'] !== q['correctIndex']">
+          <div class="q-status">{{ q['selectedIndex'] === q['correctIndex'] ? '✅ Correct' : '❌ Wrong' }}</div>
+          <div class="q-content">
+            <div class="q-text">Q{{ qi + 1 }}: {{ q['question'] }}</div>
+            <div class="q-ans your">Your answer: {{ q['options'][q['selectedIndex']] }}</div>
+            @if(q['selectedIndex'] !== q['correctIndex']) {
+            <div class="q-ans correct-ans">Correct: {{ q['options'][q['correctIndex']] }}</div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+</div>
