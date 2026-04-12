@@ -71,7 +71,7 @@ export class AskExisting implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/dashboard']);
+    window.history.back();
   }
 
   viewHistory() {

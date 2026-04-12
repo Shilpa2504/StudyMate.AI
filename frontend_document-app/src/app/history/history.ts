@@ -41,7 +41,7 @@ export class History implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/dashboard']);
+    window.history.back();
   }
 
   goToAsk() {

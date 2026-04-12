@@ -81,6 +81,10 @@ export class Dashboard implements OnInit, OnDestroy {
     this.router.navigate(['/ask-existing', id]);
   }
 
+  goToQuiz(id: number) {
+    this.router.navigate(['/quiz', id]);
+  }
+
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);

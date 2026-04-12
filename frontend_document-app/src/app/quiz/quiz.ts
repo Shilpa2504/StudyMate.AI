@@ -115,6 +115,6 @@ export class Quiz implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/ask-existing', this.sessionId]);
+    window.history.back();
   }
 }

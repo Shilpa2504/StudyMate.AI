@@ -45,5 +45,5 @@ export class AllQuizHistory implements OnInit {
     return Math.round((a.score / a.total) * 100);
   }
 
-  goBack() { this.router.navigate(['/home']); }
+  goBack() { window.history.back(); }
 }
